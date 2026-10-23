@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odumase Ben Konadu SDA BASIC - Assessment Portal</title>
+    <!-- Web Application Manifest for PWA Support -->
+    <link rel="manifest" id="pwa-manifest">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        sda: {
+                            blue: '#0B2545',
+                            navy: '#134074',
+                            accent: '#EE6C4D',
+                            gold: '#EEA243',
+                            goldHover: '#D88D2D',
+                            light: '#EEF4F8',
+                            darkBg: '#0F172A',
+                            darkCard: '#1E293B',
+                            darkBorder: '#334155'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #134074;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #EEA243;
+        }
+
+        /* Print-specific layout control */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .report-card-page {
+                page-break-after: always;
+                page-break-inside: avoid;
+                margin: 0;
+                padding: 1.5rem !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: white !important;
+                color: black !important;
+            }
+            .broadsheet-page {
+                page-break-after: always;
+                page-break-inside: avoid;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 1rem !important;
+                background: white !important;
+                color: black !important;
+            }
+            #report-card-modal, #broadsheet-modal {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                background: white !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+            #report-modal-dialog, #broadsheet-modal-dialog {
+                max-width: 100% !important;
+                max-height: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                background: white !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-sda-darkBg text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col antialiased transition-colors duration-300">
+
+    <!-- Offline Sync Warning Banner -->
+    <div id="offline-banner" class="hidden bg-amber-500 text-slate-900 px-4 py-2 text-xs font-bold text-center flex items-center justify-center gap-2 shadow-md no-print z-50">
+        <i class="fa-solid fa-wifi text-slate-900"></i>
+        <span>Offline Mode Active — All student scores, remarks, and changes are safely stored on your device.</span>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none no-print"></div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app" class="flex-1 flex flex-col">
+
+        <!-- LOGIN SCREEN -->
+        <div id="login-screen" class="flex-1 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-sda-blue via-sda-navy to-slate-900 relative no-print">
+            
+            <!-- Quick Controls on Login Page -->
+            <div class="absolute top-5 right-5 flex items-center gap-2">
+                <!-- Offline Badge on Login Screen -->
+                <span id="login-connection-badge" class="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Online</span>
+                </span>
+
+                <!-- Dark Mode Toggle -->
+                <button onclick="toggleDarkMode()" class="bg-white/10 hover:bg-white/20 text-white p-2.5 rounded-full backdrop-blur-md transition flex items-center justify-center shadow-lg" title="Toggle Theme">
+                    <i class="fa-solid fa-sun text-yellow-300 text-lg dark:hidden"></i>
+                    <i class="fa-solid fa-moon text-blue-200 text-lg hidden dark:block"></i>
+                </button>
+            </div>
+
+            <div class="bg-white dark:bg-sda-darkCard rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-sda-darkBorder transition-colors duration-300">
+                <!-- Header -->
+                <div class="bg-sda-navy dark:bg-slate-900 p-6 text-center text-white relative border-b border-sda-gold/20">
+                    <div class="w-24 h-24 mx-auto bg-white rounded-full p-1.5 shadow-lg mb-3 flex items-center justify-center overflow-hidden">
+                        <img src="watermarked_img_17552856275275738860.jpg" alt="Odumase Ben Konadu SDA Basic Crest" class="w-full h-full object-contain" onerror="this.outerHTML='<i class=\'fa-solid font-bold text-3xl text-sda-navy dark:text-sda-gold fa-school-flag\'></i>'">
+                    </div>
+                    <h1 class="text-xl font-extrabold tracking-wide text-sda-gold">ODUMASE BEN KONADU</h1>
+                    <p class="text-xs uppercase tracking-widest font-semibold text-slate-200 mt-1">SDA BASIC SCHOOL</p>
+                    <p class="text-xs text-slate-300 mt-2 italic">Motto: To Redeem and To Restore</p>
+                </div>
+
+                <div class="p-6 space-y-5">
+                    <!-- Teacher Login Form -->
+                    <form id="teacher-auth-form" onsubmit="handleTeacherLoginStep(event)" class="space-y-4">
+                        <div class="text-center">
+                            <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Teacher Sign In</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Enter your credentials to access the offline database</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Teacher's Full Name</label>
+                            <input type="text" id="teacher-login-name" required placeholder="e.g. Mr. Samuel Appiah" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Phone Number (Password)</label>
+                            <input type="tel" id="teacher-login-phone" required placeholder="e.g. 024XXXXXXX" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none">
+                        </div>
+                        <button type="submit" class="w-full bg-sda-gold hover:bg-sda-goldHover text-sda-blue font-bold py-2.5 rounded-lg transition-colors duration-200 shadow-md flex items-center justify-center gap-2">
+                            <span>Sign In to Portal</span>
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-3 border-t border-slate-100 dark:border-sda-darkBorder text-center">
+                    <p class="text-xs text-slate-400">Education for Eternity • Knowledge & Character</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD SCREEN (Hidden by default) -->
+        <div id="dashboard-screen" class="hidden flex-1 flex flex-col min-h-screen">
+            
+            <!-- Top Navigation Bar -->
+            <header class="bg-sda-blue dark:bg-slate-900 text-white shadow-md sticky top-0 z-30 no-print border-b border-slate-800">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-16">
+                        <!-- Branding -->
+                        <div class="flex items-center gap-3">
+                            <div class="bg-white rounded-full p-1 text-sda-navy flex items-center justify-center w-11 h-11 shadow overflow-hidden">
+                                <img src="watermarked_img_17552856275275738860.jpg" alt="School Crest" class="w-full h-full object-contain" onerror="this.outerHTML='<i class=\'fa-solid fa-graduation-cap text-lg\'></i>'">
+                            </div>
+                            <div>
+                                <h1 class="font-extrabold text-sm md:text-base leading-tight text-sda-gold">ODUMASE BEN KONADU SDA BASIC</h1>
+                                <p class="text-[10px] sm:text-xs text-slate-300">Assessment & Records Management System</p>
+                            </div>
+                        </div>
+
+                        <!-- Teacher Profile Info, Connection Status & Actions -->
+                        <div class="flex items-center gap-2.5">
+                            <!-- Visual Connection Badge -->
+                            <span id="nav-connection-badge" class="px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-sm bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="hidden sm:inline">Online</span>
+                            </span>
+
+                            <!-- Share Portal Button -->
+                            <button onclick="sharePortalLink()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg text-xs font-bold transition border border-slate-700 flex items-center gap-1 shadow" title="Share Portal Link">
+                                <i class="fa-solid fa-share-nodes text-sda-gold"></i>
+                                <span class="hidden md:inline text-[11px]">Share Link</span>
+                            </button>
+
+                            <div class="hidden lg:flex flex-col text-right">
+                                <span id="header-teacher-name" class="text-xs font-bold">Mr. Kwaku Mensah</span>
+                                <span id="header-teacher-class" class="text-[11px] text-sda-gold font-semibold">Teacher Portal</span>
+                            </div>
+
+                            <!-- Dark Mode Toggle Button -->
+                            <button onclick="toggleDarkMode()" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 p-2 rounded-lg text-xs font-bold transition border border-slate-700 flex items-center gap-1 shadow" title="Toggle Theme">
+                                <i class="fa-solid fa-sun text-yellow-300 dark:hidden"></i>
+                                <i class="fa-solid fa-moon text-blue-300 hidden dark:block"></i>
+                                <span class="hidden md:inline text-slate-200 text-[11px]" id="theme-btn-text">Dark Mode</span>
+                            </button>
+
+                            <button onclick="logoutTeacher()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow transition">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <span class="hidden sm:inline">Logout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Secondary Bar: Class Switcher & Quick Actions -->
+            <div class="bg-sda-navy dark:bg-slate-800/80 text-white shadow border-t border-sda-blue/40 dark:border-slate-700 no-print">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+                    
+                    <!-- Class Selector Pills -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto" id="class-pills">
+                        <!-- Class pills generated by JS -->
+                    </div>
+
+                    <!-- Search & Filter Bar -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <div class="relative flex-1 sm:w-60">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="student-search" oninput="renderStudentList()" placeholder="Search student name or ID..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-800 dark:bg-slate-900 text-white border border-slate-700 rounded-lg focus:outline-none focus:border-sda-gold placeholder-slate-400">
+                        </div>
+                        <button onclick="openAddStudentModal()" class="bg-sda-gold hover:bg-sda-goldHover text-sda-blue font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 shrink-0 shadow">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Add Student</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Main Dashboard Body -->
+            <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6 no-print">
+
+                <!-- Summary Stat Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white dark:bg-sda-darkCard p-4 rounded-xl shadow-sm border border-slate-200 dark:border-sda-darkBorder flex items-center justify-between transition-colors">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Active Class</p>
+                            <p id="stat-class-name" class="text-lg font-black text-sda-navy dark:text-sda-gold">Basic 4</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-sda-navy dark:text-sda-gold">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-sda-darkCard p-4 rounded-xl shadow-sm border border-slate-200 dark:border-sda-darkBorder flex items-center justify-between transition-colors">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Students</p>
+                            <p id="stat-total-students" class="text-lg font-black text-slate-800 dark:text-slate-100">0</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-sda-darkCard p-4 rounded-xl shadow-sm border border-slate-200 dark:border-sda-darkBorder flex items-center justify-between transition-colors">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Class Average</p>
+                            <p id="stat-class-avg" class="text-lg font-black text-emerald-600 dark:text-emerald-400">0.0%</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-sda-darkCard p-4 rounded-xl shadow-sm border border-slate-200 dark:border-sda-darkBorder flex items-center justify-between transition-colors">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Subjects Tracked</p>
+                            <p class="text-lg font-black text-purple-600 dark:text-purple-400">8 Subjects</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Area: Student Assessment Table -->
+                <div class="bg-white dark:bg-sda-darkCard rounded-xl shadow-sm border border-slate-200 dark:border-sda-darkBorder overflow-hidden transition-colors">
+                    <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-sda-darkBorder flex flex-wrap justify-between items-center gap-3 bg-slate-50 dark:bg-slate-800/50">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-sda-navy dark:text-sda-gold"></i>
+                                Student Performance & Assessment Sheet
+                            </h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Class Score (30%) + Exam Score (70%) • Auto-ranked</p>
+                        </div>
+
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button onclick="openBroadSheetModal()" class="px-3 py-1.5 text-xs bg-sda-navy hover:bg-sda-blue text-white font-bold rounded-lg flex items-center gap-1.5 transition shadow">
+                                <i class="fa-solid fa-table-cells"></i>
+                                <span>Broad Sheet View</span>
+                            </button>
+                            <button onclick="openClassBatchReportModal()" class="px-3 py-1.5 text-xs bg-sda-gold hover:bg-sda-goldHover text-sda-blue font-bold rounded-lg flex items-center gap-1.5 transition shadow">
+                                <i class="fa-solid fa-print"></i>
+                                <span>Print All Class Reports</span>
+                            </button>
+                            <button onclick="exportClassSummaryCSV()" class="px-3 py-1.5 text-xs bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-lg flex items-center gap-1 transition">
+                                <i class="fa-solid fa-file-csv"></i>
+                                <span>Export CSV</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Responsive Scroll Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 uppercase font-bold border-b border-slate-200 dark:border-sda-darkBorder">
+                                <tr>
+                                    <th class="py-3 px-4 text-center">Rank</th>
+                                    <th class="py-3 px-4">Student Name & ID</th>
+                                    <th class="py-3 px-4 text-center">Gender</th>
+                                    <th class="py-3 px-4 text-center">Total Score</th>
+                                    <th class="py-3 px-4 text-center">Average (%)</th>
+                                    <th class="py-3 px-4 text-center">Overall Grade</th>
+                                    <th class="py-3 px-4">Teacher's Remark</th>
+                                    <th class="py-3 px-4 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-body" class="divide-y divide-slate-200 dark:divide-slate-700/60">
+                                <!-- Dynamic rows generated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="empty-state" class="hidden p-8 text-center text-slate-400 dark:text-slate-500">
+                        <i class="fa-solid fa-folder-open text-4xl mb-2 text-slate-300 dark:text-slate-600"></i>
+                        <p class="text-sm font-medium">No student records found for this class.</p>
+                        <p class="text-xs">Click "Add Student" to create a record.</p>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- FOOTER -->
+            <footer class="bg-white dark:bg-sda-darkCard border-t border-slate-200 dark:border-sda-darkBorder py-4 px-6 text-center text-xs text-slate-500 dark:text-slate-400 mt-auto no-print flex flex-col sm:flex-row justify-between items-center gap-2">
+                <p>© Odumase Ben Konadu SDA BASIC School Assessment System.</p>
+                <p class="text-[11px] text-slate-400"><i class="fa-solid fa-shield-halved text-sda-gold"></i> Local Storage Offline Mode Active</p>
+            </footer>
+        </div>
+
+    </div>
+
+    <!-- MODAL 1: ADD / EDIT STUDENT PROFILE -->
+    <div id="modal-student" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
+        <div class="bg-white dark:bg-sda-darkCard rounded-xl shadow-xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-sda-darkBorder transition-colors">
+            <div class="bg-sda-navy dark:bg-slate-900 px-5 py-4 text-white flex justify-between items-center border-b border-sda-gold/20">
+                <h3 id="modal-student-title" class="font-bold text-sm">Add New Student</h3>
+                <button onclick="closeStudentModal()" class="text-slate-300 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+            <form id="form-student" onsubmit="saveStudentInfo(event)" class="p-5 space-y-4">
+                <input type="hidden" id="student-edit-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Full Student Name</label>
+                    <input type="text" id="student-name" required placeholder="e.g. Kwame Prempeh" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Gender</label>
+                        <select id="student-gender" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Student ID (Optional)</label>
+                        <input type="text" id="student-code" placeholder="Auto-generated if empty" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Attendance (Days Present)</label>
+                        <input type="number" id="student-attendance" min="0" max="100" value="65" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Out of Total Days</label>
+                        <input type="number" id="student-total-days" min="1" max="100" value="65" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">General Conduct & Attitude</label>
+                    <input type="text" id="student-conduct" value="Satisfactory and Respectful" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none">
+                </div>
+                <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-sda-darkBorder">
+                    <button type="button" onclick="closeStudentModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold text-sda-blue bg-sda-gold hover:bg-sda-goldHover rounded-lg shadow">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ENTER/EDIT ASSESSMENT SCORES -->
+    <div id="modal-scores" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-2 sm:p-4 no-print">
+        <div class="bg-white dark:bg-sda-darkCard rounded-xl shadow-xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 dark:border-sda-darkBorder transition-colors">
+            <!-- Modal Header -->
+            <div class="bg-sda-blue dark:bg-slate-900 px-5 py-4 text-white flex justify-between items-center shrink-0 border-b border-sda-gold/20">
+                <div>
+                    <h3 class="font-bold text-base" id="score-modal-student-name">Student Marks Entry</h3>
+                    <p class="text-xs text-sda-gold" id="score-modal-student-info">Basic 4 • Overall Position: --</p>
+                </div>
+                <button onclick="closeScoresModal()" class="text-slate-300 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <!-- Modal Content - Scrollable Form -->
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1">
+                
+                <!-- Quick Info Banner -->
+                <div class="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 rounded-lg p-3 text-xs text-blue-900 dark:text-blue-200 flex items-start gap-2">
+                    <i class="fa-solid fa-circle-info text-blue-600 dark:text-blue-400 text-sm mt-0.5"></i>
+                    <div>
+                        <p class="font-semibold">Grading Standard (Class Score 30% + Exam Score 70% = Total 100%):</p>
+                        <p>Class Assessment is scaled out of 30, Examination is scaled out of 70. Subject Totals calculate automatically.</p>
+                    </div>
+                </div>
+
+                <!-- Subjects Entry List -->
+                <div class="space-y-3" id="subject-scores-container">
+                    <!-- Subject rows rendered dynamically -->
+                </div>
+
+                <!-- Teacher Remarks Section -->
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-sda-darkBorder space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 uppercase">Teacher's Remarks</label>
+                        <button type="button" onclick="autoSuggestRemark()" class="text-xs text-sda-navy dark:text-sda-gold font-semibold hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-wand-magic-sparkles text-sda-gold"></i> Auto-Generate Remark
+                        </button>
+                    </div>
+                    <textarea id="modal-teacher-remark" rows="2" class="w-full p-2.5 text-xs bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sda-gold focus:outline-none" placeholder="Enter teacher's comments..."></textarea>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-100 dark:bg-slate-800/80 px-5 py-3 border-t border-slate-200 dark:border-sda-darkBorder flex justify-between items-center shrink-0">
+                <div class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Calculated Overall: <span id="modal-live-total" class="text-sda-navy dark:text-sda-gold font-extrabold text-sm">0 / 800</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="closeScoresModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg">Cancel</button>
+                    <button onclick="saveStudentScores()" class="px-4 py-2 text-xs font-bold text-sda-blue bg-sda-gold hover:bg-sda-goldHover rounded-lg shadow">Save Marks</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CLASS BROAD SHEET MATRIX MODAL -->
+    <div id="broadsheet-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-2 sm:p-4">
+        <div id="broadsheet-modal-dialog" class="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[95vh] flex flex-col overflow-hidden border border-slate-300">
+            <!-- Broad Sheet Controls Bar -->
+            <div class="bg-sda-navy text-white px-4 py-3 flex justify-between items-center no-print shrink-0 border-b border-sda-gold/20">
+                <span class="text-xs font-bold text-sda-gold"><i class="fa-solid fa-table-cells mr-1"></i> Class Broad Sheet Matrix</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="printBroadSheet()" class="bg-sda-gold hover:bg-sda-goldHover text-sda-blue font-bold px-3 py-1.5 rounded text-xs flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-print"></i> Print Broad Sheet
+                    </button>
+                    <button onclick="closeBroadSheetModal()" class="text-slate-300 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Broad Sheet Content Container -->
+            <div id="printable-broadsheet" class="p-6 overflow-y-auto bg-white text-slate-900 font-sans flex-1">
+                <!-- Broad sheet table dynamically injected -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: TERMINAL REPORT CARD PREVIEW / PRINT MODAL -->
+    <div id="report-card-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-2 sm:p-4">
+        <div id="report-modal-dialog" class="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[95vh] flex flex-col overflow-hidden border border-slate-300">
+            <!-- Modal Print Controls Bar -->
+            <div class="bg-slate-800 text-white px-4 py-3 flex justify-between items-center no-print shrink-0 border-b border-slate-700">
+                <span class="text-xs font-bold text-sda-gold" id="report-modal-header-title"><i class="fa-solid fa-file-invoice mr-1"></i> Student Terminal Report Preview</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="printReportCard()" class="bg-sda-gold hover:bg-sda-goldHover text-sda-blue font-bold px-3 py-1.5 rounded text-xs flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-print"></i> Print Report Card
+                    </button>
+                    <button onclick="closeReportModal()" class="text-slate-300 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Report Card Container for Print -->
+            <div id="printable-report-card" class="p-6 sm:p-8 overflow-y-auto bg-white text-slate-900 font-sans flex-1">
+                <!-- Report card dynamic content injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC & OFFLINE ENGINE -->
+    <script>
+        // --- CONSTANTS & DEFAULT DATA STRUCTURES ---
+        const SUBJECTS = [
+            'English Language',
+            'Mathematics',
+            'Science',
+            'Social Studies',
+            'Religious & Moral Ed.',
+            'Creative Arts',
+            'Ghanaian Language',
+            'Computing'
+        ];
+
+        const CLASSES = ['Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6'];
+
+        // Initial default sample dataset (Weighted: Class 30% + Exam 70%)
+        const INITIAL_STUDENT_DATA = {
+            'Basic 4': [
+                {
+                    id: 'SDA-B4-001',
+                    name: 'Kofi Owusu',
+                    gender: 'Male',
+                    attendance: 62,
+                    totalDays: 65,
+                    conduct: 'Obedient and Hardworking',
+                    scores: {
+                        'English Language': { classScore: 26, examScore: 62 },
+                        'Mathematics': { classScore: 28, examScore: 65 },
+                        'Science': { classScore: 25, examScore: 58 },
+                        'Social Studies': { classScore: 24, examScore: 56 },
+                        'Religious & Moral Ed.': { classScore: 27, examScore: 63 },
+                        'Creative Arts': { classScore: 25, examScore: 61 },
+                        'Ghanaian Language': { classScore: 22, examScore: 54 },
+                        'Computing': { classScore: 26, examScore: 60 }
+                    },
+                    remark: 'An outstanding performance! Keep striving for excellence.'
+                },
+                {
+                    id: 'SDA-B4-002',
+                    name: 'Abena Mansah',
+                    gender: 'Female',
+                    attendance: 65,
+                    totalDays: 65,
+                    conduct: 'Very polite and studious',
+                    scores: {
+                        'English Language': { classScore: 22, examScore: 50 },
+                        'Mathematics': { classScore: 18, examScore: 42 },
+                        'Science': { classScore: 20, examScore: 48 },
+                        'Social Studies': { classScore: 21, examScore: 50 },
+                        'Religious & Moral Ed.': { classScore: 23, examScore: 52 },
+                        'Creative Arts': { classScore: 22, examScore: 50 },
+                        'Ghanaian Language': { classScore: 23, examScore: 51 },
+                        'Computing': { classScore: 19, examScore: 45 }
+                    },
+                    remark: 'Good work done. Needs a bit more effort in Mathematics.'
+                },
+                {
+                    id: 'SDA-B4-003',
+                    name: 'Kwaku Addo',
+                    gender: 'Male',
+                    attendance: 58,
+                    totalDays: 65,
+                    conduct: 'Punctual and active',
+                    scores: {
+                        'English Language': { classScore: 15, examScore: 35 },
+                        'Mathematics': { classScore: 14, examScore: 38 },
+                        'Science': { classScore: 16, examScore: 39 },
+                        'Social Studies': { classScore: 18, examScore: 42 },
+                        'Religious & Moral Ed.': { classScore: 20, examScore: 45 },
+                        'Creative Arts': { classScore: 19, examScore: 42 },
+                        'Ghanaian Language': { classScore: 17, examScore: 36 },
+                        'Computing': { classScore: 15, examScore: 35 }
+                    },
+                    remark: 'Average result. Focus more on reading and core subjects next term.'
+                }
+            ],
+            'Basic 1': [
+                {
+                    id: 'SDA-B1-001',
+                    name: 'Ama Serwaa',
+                    gender: 'Female',
+                    attendance: 64,
+                    totalDays: 65,
+                    conduct: 'Cooperative and well behaved',
+                    scores: {
+                        'English Language': { classScore: 25, examScore: 58 },
+                        'Mathematics': { classScore: 22, examScore: 52 },
+                        'Science': { classScore: 24, examScore: 54 },
+                        'Social Studies': { classScore: 21, examScore: 49 },
+                        'Religious & Moral Ed.': { classScore: 26, examScore: 59 },
+                        'Creative Arts': { classScore: 28, examScore: 62 },
+                        'Ghanaian Language': { classScore: 22, examScore: 50 },
+                        'Computing': { classScore: 20, examScore: 48 }
+                    },
+                    remark: 'Excellent progress made in Basic 1. Well done!'
+                }
+            ]
+        };
+
+        // Ensure all classes exist in schema
+        CLASSES.forEach(cls => {
+            if (!INITIAL_STUDENT_DATA[cls]) INITIAL_STUDENT_DATA[cls] = [];
+        });
+
+        // App Global State
+        let db = {};
+        let currentTeacher = { name: '', phone: '' };
+        let activeClass = 'Basic 4';
+        let editingStudentId = null;
+
+        // --- APP INITIALIZATION & SERVICE WORKER ---
+        window.onload = function() {
+            initPWAandOffline();
+            initTheme();
+            loadDatabase();
+            renderClassPills();
+            setupNetworkListeners();
+        };
+
+        // Offline PWA Service Worker Embedded via Data URL/Blob
+        function initPWAandOffline() {
+            // Manifest setup dynamically
+            const manifestObj = {
+                name: "Odumase Ben Konadu SDA BASIC Portal",
+                short_name: "SDA Portal",
+                start_url: window.location.href,
+                display: "standalone",
+                background_color: "#0F172A",
+                theme_color: "#0B2545"
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/json'});
+            document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'sda-portal-v1';
+                    self.addEventListener('install', (e) => {
+                        self.skipWaiting();
+                    });
+                    self.addEventListener('activate', (e) => {
+                        e.waitUntil(clients.claim());
+                    });
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            caches.match(e.request).then((res) => {
+                                return res || fetch(e.request).then((response) => {
+                                    return caches.open(CACHE_NAME).then((cache) => {
+                                        if (e.request.method === 'GET' && e.request.url.startsWith('http')) {
+                                            cache.put(e.request, response.clone());
+                                        }
+                                        return response;
+                                    });
+                                }).catch(() => caches.match(e.request));
+                            })
+                        );
+                    });
+                `;
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl).catch(() => {});
+            }
+        }
+
+        function setupNetworkListeners() {
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            updateOnlineStatus();
+        }
+
+        function updateOnlineStatus() {
+            const isOnline = navigator.onLine;
+            const loginBadge = document.getElementById('login-connection-badge');
+            const navBadge = document.getElementById('nav-connection-badge');
+            const offlineBanner = document.getElementById('offline-banner');
+
+            if (isOnline) {
+                if (loginBadge) {
+                    loginBadge.className = "px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                    loginBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>Online</span>`;
+                }
+                if (navBadge) {
+                    navBadge.className = "px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-sm bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                    navBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="hidden sm:inline">Online</span>`;
+                }
+                if (offlineBanner) offlineBanner.classList.add('hidden');
+            } else {
+                if (loginBadge) {
+                    loginBadge.className = "px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                    loginBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span><span>Offline Mode</span>`;
+                }
+                if (navBadge) {
+                    navBadge.className = "px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-sm bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                    navBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span><span class="hidden sm:inline">Offline Mode</span>`;
+                }
+                if (offlineBanner) offlineBanner.classList.remove('hidden');
+            }
+        }
+
+        // --- DARK MODE LOGIC ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('sda_theme');
+            if (savedTheme) {
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                } else {
+                    document.documentElement.classList.add('light');
+                    document.documentElement.classList.remove('dark');
+                }
+            } else {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.add('light');
+                }
+            }
+            updateThemeButtonText();
+        }
+
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                localStorage.setItem('sda_theme', 'light');
+                showToast("Switched to Light Mode");
+            } else {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+                localStorage.setItem('sda_theme', 'dark');
+                showToast("Switched to Dark Mode");
+            }
+            updateThemeButtonText();
+        }
+
+        function updateThemeButtonText() {
+            const btnText = document.getElementById('theme-btn-text');
+            if (btnText) {
+                btnText.textContent = document.documentElement.classList.contains('dark') ? 'Light Mode' : 'Dark Mode';
+            }
+        }
+
+        // LocalStorage & Offline Data Management
+        function loadDatabase() {
+            const saved = localStorage.getItem('sda_school_db');
+            if (saved) {
+                try {
+                    db = JSON.parse(saved);
+                } catch(e) {
+                    db = INITIAL_STUDENT_DATA;
+                }
+            } else {
+                db = INITIAL_STUDENT_DATA;
+                saveDatabase();
+            }
+        }
+
+        function saveDatabase() {
+            localStorage.setItem('sda_school_db', JSON.stringify(db));
+        }
+
+        // --- AUTHENTICATION / LOGIN FUNCTIONS ---
+        function handleTeacherLoginStep(e) {
+            e.preventDefault();
+            const name = document.getElementById('teacher-login-name').value.trim();
+            const phone = document.getElementById('teacher-login-phone').value.trim();
+
+            if (!name || !phone) {
+                showToast('Please enter your Full Name and Phone Number.');
+                return;
+            }
+
+            currentTeacher = {
+                name: name,
+                phone: phone
+            };
+
+            enterDashboard();
+        }
+
+        function resetToTeacherLogin() {
+            document.getElementById('teacher-login-name').value = '';
+            document.getElementById('teacher-login-phone').value = '';
+        }
+
+        function enterDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+
+            document.getElementById('header-teacher-name').textContent = currentTeacher.name;
+            document.getElementById('header-teacher-class').textContent = `Teacher (${currentTeacher.phone})`;
+
+            switchClass(activeClass);
+        }
+
+        function logoutTeacher() {
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            resetToTeacherLogin();
+            showToast('Logged out successfully.');
+        }
+
+        // --- CLASS SWITCHING & PILLS ---
+        function renderClassPills() {
+            const container = document.getElementById('class-pills');
+            container.innerHTML = CLASSES.map(cls => {
+                const isActive = cls === activeClass;
+                return `
+                    <button onclick="switchClass('${cls}')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${
+                        isActive 
+                        ? 'bg-sda-gold text-sda-blue shadow' 
+                        : 'bg-sda-blue hover:bg-slate-700 dark:bg-slate-900 dark:hover:bg-slate-700 text-slate-200 border border-slate-700'
+                    }">
+                        ${cls}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function switchClass(clsName) {
+            activeClass = clsName;
+            renderClassPills();
+            renderStudentList();
+            updateStats();
+        }
+
+        // --- CALCULATIONS ENGINE (30% Class + 70% Exam) ---
+        function calculateSubjectTotal(subjectScoreObj) {
+            if (!subjectScoreObj) return 0;
+            const c = Math.min(30, Math.max(0, parseFloat(subjectScoreObj.classScore) || 0));
+            const e = Math.min(70, Math.max(0, parseFloat(subjectScoreObj.examScore) || 0));
+            return parseFloat((c + e).toFixed(1));
+        }
+
+        function getGradeAndRemark(score) {
+            if (score >= 80) return { grade: 'A1', descriptor: 'Excellent', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' };
+            if (score >= 70) return { grade: 'B2', descriptor: 'Very Good', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300' };
+            if (score >= 65) return { grade: 'B3', descriptor: 'Good', color: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300' };
+            if (score >= 60) return { grade: 'C4', descriptor: 'Credit', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300' };
+            if (score >= 55) return { grade: 'C5', descriptor: 'Credit', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300' };
+            if (score >= 50) return { grade: 'C6', descriptor: 'Credit', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' };
+            if (score >= 45) return { grade: 'D7', descriptor: 'Pass', color: 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300' };
+            if (score >= 40) return { grade: 'E8', descriptor: 'Pass', color: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300' };
+            return { grade: 'F9', descriptor: 'Fail', color: 'bg-red-200 text-red-900 dark:bg-red-900/60 dark:text-red-200 font-bold' };
+        }
+
+        function computeStudentTotals(student) {
+            let totalMarks = 0;
+            const subjectCount = SUBJECTS.length;
+            
+            SUBJECTS.forEach(subj => {
+                const subjObj = student.scores ? student.scores[subj] : { classScore: 0, examScore: 0 };
+                totalMarks += calculateSubjectTotal(subjObj);
+            });
+
+            totalMarks = parseFloat(totalMarks.toFixed(1));
+            const maxPossible = subjectCount * 100;
+            const percentage = maxPossible > 0 ? (totalMarks / maxPossible) * 100 : 0;
+            const gradeInfo = getGradeAndRemark(percentage);
+
+            return {
+                totalMarks,
+                maxPossible,
+                percentage: percentage.toFixed(1),
+                grade: gradeInfo.grade,
+                descriptor: gradeInfo.descriptor,
+                badgeColor: gradeInfo.color
+            };
+        }
+
+        function getRankedClassStudents(clsName) {
+            const list = db[clsName] || [];
+            
+            const computedList = list.map(s => {
+                const calc = computeStudentTotals(s);
+                return {
+                    ...s,
+                    computed: calc
+                };
+            });
+
+            computedList.sort((a, b) => b.computed.totalMarks - a.computed.totalMarks);
+
+            computedList.forEach((s, index) => {
+                s.rank = index + 1;
+                s.rankSuffix = getOrdinalSuffix(index + 1);
+            });
+
+            return computedList;
+        }
+
+        function getOrdinalSuffix(i) {
+            const j = i % 10, k = i % 100;
+            if (j === 1 && k !== 11) return i + "st";
+            if (j === 2 && k !== 12) return i + "nd";
+            if (j === 3 && k !== 13) return i + "rd";
+            return i + "th";
+        }
+
+        // --- DASHBOARD RENDER & LISTING ---
+        function renderStudentList() {
+            const tableBody = document.getElementById('student-table-body');
+            const emptyState = document.getElementById('empty-state');
+            const searchKeyword = (document.getElementById('student-search').value || '').toLowerCase();
+
+            const rankedStudents = getRankedClassStudents(activeClass);
+
+            const filtered = rankedStudents.filter(s => 
+                s.name.toLowerCase().includes(searchKeyword) || 
+                s.id.toLowerCase().includes(searchKeyword)
+            );
+
+            if (filtered.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            tableBody.innerHTML = filtered.map(s => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition">
+                    <td class="py-3 px-4 text-center font-black text-sda-navy dark:text-sda-gold">
+                        <span class="inline-block px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                            ${s.rankSuffix}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm">${escapeHTML(s.name)}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">${s.id}</div>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2 py-0.5 text-[10px] rounded font-semibold ${s.gender === 'Male' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-pink-50 text-pink-700 dark:bg-pink-950 dark:text-pink-300'}">
+                            ${s.gender}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-center font-bold text-slate-700 dark:text-slate-200">
+                        ${s.computed.totalMarks} <span class="text-[10px] text-slate-400">/ ${s.computed.maxPossible}</span>
+                    </td>
+                    <td class="py-3 px-4 text-center font-bold text-sda-navy dark:text-sda-gold">
+                        ${s.computed.percentage}%
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2.5 py-1 rounded text-[10px] font-extrabold ${s.computed.badgeColor}">
+                            ${s.computed.grade} (${s.computed.descriptor})
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300 max-w-xs truncate text-[11px]" title="${escapeHTML(s.remark || '')}">
+                        ${escapeHTML(s.remark || 'No remark entered')}
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="openScoresModal('${s.id}')" title="Enter Marks" class="p-1.5 bg-sda-navy text-white hover:bg-sda-blue rounded transition shadow-sm">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="openReportModal('${s.id}')" title="Print Single Report Card" class="p-1.5 bg-emerald-600 text-white hover:bg-emerald-700 rounded transition shadow-sm">
+                                <i class="fa-solid fa-file-invoice"></i>
+                            </button>
+                            <button onclick="openEditStudentModal('${s.id}')" title="Edit Student Profile" class="p-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 rounded transition">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </button>
+                            <button onclick="deleteStudent('${s.id}')" title="Delete Student" class="p-1.5 bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900 rounded transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats() {
+            const ranked = getRankedClassStudents(activeClass);
+            document.getElementById('stat-class-name').textContent = activeClass;
+            document.getElementById('stat-total-students').textContent = ranked.length;
+
+            if (ranked.length > 0) {
+                const sumAvg = ranked.reduce((acc, curr) => acc + parseFloat(curr.computed.percentage), 0);
+                const classAvg = (sumAvg / ranked.length).toFixed(1);
+                document.getElementById('stat-class-avg').textContent = `${classAvg}%`;
+            } else {
+                document.getElementById('stat-class-avg').textContent = '0.0%';
+            }
+        }
+
+        // --- STUDENT PROFILE ACTIONS ---
+        function openAddStudentModal() {
+            document.getElementById('modal-student-title').textContent = `Add Student to ${activeClass}`;
+            document.getElementById('form-student').reset();
+            document.getElementById('student-edit-id').value = '';
+            document.getElementById('modal-student').classList.remove('hidden');
+        }
+
+        function openEditStudentModal(studentId) {
+            const list = db[activeClass] || [];
+            const student = list.find(s => s.id === studentId);
+            if (!student) return;
+
+            document.getElementById('modal-student-title').textContent = `Edit Student Profile`;
+            document.getElementById('student-edit-id').value = student.id;
+            document.getElementById('student-name').value = student.name;
+            document.getElementById('student-gender').value = student.gender || 'Male';
+            document.getElementById('student-code').value = student.id;
+            document.getElementById('student-attendance').value = student.attendance || 65;
+            document.getElementById('student-total-days').value = student.totalDays || 65;
+            document.getElementById('student-conduct').value = student.conduct || 'Satisfactory';
+
+            document.getElementById('modal-student').classList.remove('hidden');
+        }
+
+        function closeStudentModal() {
+            document.getElementById('modal-student').classList.add('hidden');
+        }
+
+        function saveStudentInfo(e) {
+            e.preventDefault();
+            const editId = document.getElementById('student-edit-id').value;
+            const name = document.getElementById('student-name').value.trim();
+            const gender = document.getElementById('student-gender').value;
+            let code = document.getElementById('student-code').value.trim();
+            const attendance = parseInt(document.getElementById('student-attendance').value) || 0;
+            const totalDays = parseInt(document.getElementById('student-total-days').value) || 65;
+            const conduct = document.getElementById('student-conduct').value.trim();
+
+            if (!db[activeClass]) db[activeClass] = [];
+
+            if (editId) {
+                const index = db[activeClass].findIndex(s => s.id === editId);
+                if (index !== -1) {
+                    db[activeClass][index].name = name;
+                    db[activeClass][index].gender = gender;
+                    db[activeClass][index].attendance = attendance;
+                    db[activeClass][index].totalDays = totalDays;
+                    db[activeClass][index].conduct = conduct;
+                }
+            } else {
+                if (!code) {
+                    code = `SDA-${activeClass.replace(' ', '')}-${Math.floor(100 + Math.random() * 900)}`;
+                }
+                const newStudent = {
+                    id: code,
+                    name,
+                    gender,
+                    attendance,
+                    totalDays,
+                    conduct,
+                    scores: {},
+                    remark: ''
+                };
+                SUBJECTS.forEach(sub => {
+                    newStudent.scores[sub] = { classScore: 0, examScore: 0 };
+                });
+                db[activeClass].push(newStudent);
+            }
+
+            saveDatabase();
+            closeStudentModal();
+            renderStudentList();
+            updateStats();
+            showToast('Student profile saved offline!');
+        }
+
+        function deleteStudent(studentId) {
+            if (!confirm("Are you sure you want to delete this student's assessment record?")) return;
+            
+            db[activeClass] = db[activeClass].filter(s => s.id !== studentId);
+            saveDatabase();
+            renderStudentList();
+            updateStats();
+            showToast('Student record removed.');
+        }
+
+        // --- MARKS & ASSESSMENT ENTRY ---
+        function openScoresModal(studentId) {
+            editingStudentId = studentId;
+            const rankedList = getRankedClassStudents(activeClass);
+            const student = rankedList.find(s => s.id === studentId);
+            if (!student) return;
+
+            document.getElementById('score-modal-student-name').textContent = `${student.name} (${student.id})`;
+            document.getElementById('score-modal-student-info').textContent = `${activeClass} • Current Rank: ${student.rankSuffix}`;
+            document.getElementById('modal-teacher-remark').value = student.remark || '';
+
+            const container = document.getElementById('subject-scores-container');
+            container.innerHTML = SUBJECTS.map((subj, index) => {
+                const subObj = (student.scores && student.scores[subj]) ? student.scores[subj] : { classScore: 0, examScore: 0 };
+                const tot = calculateSubjectTotal(subObj);
+
+                return `
+                    <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+                        <div class="w-full sm:w-1/3">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-100 block">${index + 1}. ${subj}</span>
+                            <span class="text-[10px] text-slate-400">Class Score (30%) + Exam Score (70%)</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400">Class (30)</label>
+                                <input type="number" min="0" max="30" step="0.5" 
+                                    id="score-class-${index}" 
+                                    value="${subObj.classScore}" 
+                                    oninput="updateModalLiveTotal()" 
+                                    class="w-20 px-2 py-1 text-xs bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded focus:ring-1 focus:ring-sda-gold focus:outline-none">
+                            </div>
+
+                            <span class="text-slate-400 font-bold text-xs mt-3">+</span>
+
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400">Exam (70)</label>
+                                <input type="number" min="0" max="70" step="0.5" 
+                                    id="score-exam-${index}" 
+                                    value="${subObj.examScore}" 
+                                    oninput="updateModalLiveTotal()" 
+                                    class="w-20 px-2 py-1 text-xs bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded focus:ring-1 focus:ring-sda-gold focus:outline-none">
+                            </div>
+
+                            <div class="text-right ml-auto sm:ml-4 min-w-[70px]">
+                                <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400">Total Score</label>
+                                <span id="score-total-${index}" class="text-xs font-black text-sda-navy dark:text-sda-gold block">${tot}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateModalLiveTotal();
+            document.getElementById('modal-scores').classList.remove('hidden');
+        }
+
+        function updateModalLiveTotal() {
+            let overallTotal = 0;
+            SUBJECTS.forEach((subj, index) => {
+                const cEl = document.getElementById(`score-class-${index}`);
+                const eEl = document.getElementById(`score-exam-${index}`);
+                const totEl = document.getElementById(`score-total-${index}`);
+
+                if (cEl && eEl && totEl) {
+                    const c = Math.min(30, Math.max(0, parseFloat(cEl.value) || 0));
+                    const e = Math.min(70, Math.max(0, parseFloat(eEl.value) || 0));
+                    const sum = parseFloat((c + e).toFixed(1));
+                    totEl.textContent = sum;
+                    overallTotal += sum;
+                }
+            });
+
+            document.getElementById('modal-live-total').textContent = `${overallTotal.toFixed(1)} / ${SUBJECTS.length * 100}`;
+        }
+
+        function autoSuggestRemark() {
+            let overallTotal = 0;
+            SUBJECTS.forEach((subj, index) => {
+                const c = Math.min(30, Math.max(0, parseFloat(document.getElementById(`score-class-${index}`)?.value) || 0));
+                const e = Math.min(70, Math.max(0, parseFloat(document.getElementById(`score-exam-${index}`)?.value) || 0));
+                overallTotal += (c + e);
+            });
+
+            const avg = overallTotal / SUBJECTS.length;
+            let remark = "";
+
+            if (avg >= 80) remark = "An outstanding performance! Shows exceptional brilliance and discipline across all subjects.";
+            else if (avg >= 70) remark = "Very good result. Demonstrates strong potential and consistent class effort.";
+            else if (avg >= 60) remark = "Good performance overall. With extra focus in weak areas, can attain high distinction.";
+            else if (avg >= 50) remark = "Fair effort made this term. Needs to pay more attention to studies and revise regular core subjects.";
+            else remark = "Performance is below expectation. Requires intensive academic guidance and strict personal study habits.";
+
+            document.getElementById('modal-teacher-remark').value = remark;
+        }
+
+        function saveStudentScores() {
+            if (!editingStudentId) return;
+
+            const list = db[activeClass] || [];
+            const studentIndex = list.findIndex(s => s.id === editingStudentId);
+            if (studentIndex === -1) return;
+
+            const updatedScores = {};
+            SUBJECTS.forEach((subj, index) => {
+                const c = Math.min(30, Math.max(0, parseFloat(document.getElementById(`score-class-${index}`).value) || 0));
+                const e = Math.min(70, Math.max(0, parseFloat(document.getElementById(`score-exam-${index}`).value) || 0));
+                updatedScores[subj] = { classScore: c, examScore: e };
+            });
+
+            db[activeClass][studentIndex].scores = updatedScores;
+            db[activeClass][studentIndex].remark = document.getElementById('modal-teacher-remark').value.trim();
+
+            saveDatabase();
+            closeScoresModal();
+            renderStudentList();
+            updateStats();
+            showToast("Marks updated & saved offline!");
+        }
+
+        function closeScoresModal() {
+            document.getElementById('modal-scores').classList.add('hidden');
+            editingStudentId = null;
+        }
+
+        // --- BROAD SHEET MATRIX GENERATOR ---
+        function openBroadSheetModal() {
+            const rankedList = getRankedClassStudents(activeClass);
+            const container = document.getElementById('printable-broadsheet');
+
+            const headerSubjectsHtml = SUBJECTS.map(s => `<th class="py-2 px-2 text-center text-[10px] uppercase font-extrabold border border-slate-300 bg-slate-100">${s}</th>`).join('');
+
+            const rowsHtml = rankedList.map(student => {
+                const subjCols = SUBJECTS.map(subj => {
+                    const subjObj = student.scores ? student.scores[subj] : { classScore: 0, examScore: 0 };
+                    const tot = calculateSubjectTotal(subjObj);
+                    return `<td class="py-1.5 px-2 text-center font-bold border border-slate-200 text-[11px]">${tot}</td>`;
+                }).join('');
+
+                return `
+                    <tr class="border-b border-slate-200 text-xs">
+                        <td class="py-1.5 px-2 text-center font-black text-sda-navy border border-slate-200">${student.rankSuffix}</td>
+                        <td class="py-1.5 px-2 font-bold text-slate-800 border border-slate-200 whitespace-nowrap">${escapeHTML(student.name)}</td>
+                        ${subjCols}
+                        <td class="py-1.5 px-2 text-center font-black text-sda-blue bg-slate-50 border border-slate-200">${student.computed.totalMarks}</td>
+                        <td class="py-1.5 px-2 text-center font-bold text-emerald-700 bg-slate-50 border border-slate-200">${student.computed.percentage}%</td>
+                    </tr>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="broadsheet-page">
+                    <div class="text-center mb-4 border-b-2 border-sda-navy pb-3">
+                        <h2 class="text-lg font-black text-sda-navy">ODUMASE BEN KONADU SDA BASIC SCHOOL</h2>
+                        <p class="text-xs font-bold text-sda-gold uppercase">Master Assessment Broad Sheet • ${activeClass}</p>
+                        <p class="text-[11px] text-slate-500">Motto: To Redeem and To Restore • Term Terminal Records</p>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse border border-slate-300 text-xs">
+                            <thead>
+                                <tr>
+                                    <th class="py-2 px-2 text-center text-[10px] uppercase font-extrabold border border-slate-300 bg-slate-100">Pos</th>
+                                    <th class="py-2 px-2 text-[10px] uppercase font-extrabold border border-slate-300 bg-slate-100">Student Name</th>
+                                    ${headerSubjectsHtml}
+                                    <th class="py-2 px-2 text-center text-[10px] uppercase font-extrabold border border-slate-300 bg-sda-gold text-sda-blue">Total (800)</th>
+                                    <th class="py-2 px-2 text-center text-[10px] uppercase font-extrabold border border-slate-300 bg-sda-gold text-sda-blue">Avg %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-6 flex justify-between text-xs pt-4 border-t border-slate-300">
+                        <div><span class="font-bold">Class Teacher:</span> ${currentTeacher.name || '------------------'}</div>
+                        <div><span class="font-bold">Headteacher's Signature:</span> ------------------</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('broadsheet-modal').classList.remove('hidden');
+        }
+
+        function closeBroadSheetModal() {
+            document.getElementById('broadsheet-modal').classList.add('hidden');
+        }
+
+        function printBroadSheet() {
+            window.print();
+        }
+
+        // --- REPORT CARD GENERATOR (INDIVIDUAL & BATCH CLASS PRINTING) ---
+        function generateReportCardHTML(student, totalStudentsInClass) {
+            const rowsHtml = SUBJECTS.map((subj, idx) => {
+                const subjObj = student.scores ? student.scores[subj] : { classScore: 0, examScore: 0 };
+                const tot = calculateSubjectTotal(subjObj);
+                const g = getGradeAndRemark(tot);
+
+                return `
+                    <tr class="border-b border-slate-200 text-xs">
+                        <td class="py-2 px-3 font-medium text-slate-800">${idx + 1}. ${subj}</td>
+                        <td class="py-2 px-3 text-center text-slate-600">${subjObj.classScore || 0}</td>
+                        <td class="py-2 px-3 text-center text-slate-600">${subjObj.examScore || 0}</td>
+                        <td class="py-2 px-3 text-center font-bold text-sda-navy">${tot}</td>
+                        <td class="py-2 px-3 text-center font-bold">${g.grade}</td>
+                        <td class="py-2 px-3 text-center text-slate-600">${g.descriptor}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div class="report-card-page mb-8">
+                    <!-- School Header -->
+                    <div class="border-b-2 border-sda-navy pb-4 mb-5 text-center relative">
+                        <div class="flex items-center justify-center gap-4 mb-2">
+                            <div class="w-20 h-20 bg-white rounded-full p-1 border border-slate-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                                <img src="watermarked_img_17552856275275738860.jpg" alt="Odumase Ben Konadu SDA Basic Crest" class="w-full h-full object-contain" onerror="this.outerHTML='<i class=\'fa-solid fa-school-flag text-sda-navy text-2xl\'></i>'">
+                            </div>
+                            <div class="text-left">
+                                <h2 class="text-xl font-black text-sda-navy uppercase tracking-tight">ODUMASE BEN KONADU SDA BASIC</h2>
+                                <p class="text-xs font-bold text-sda-gold uppercase">Seventh-day Adventist Educational Unit</p>
+                                <p class="text-[11px] text-slate-500">P.O. Box 12, Odumase • Motto: To Redeem and To Restore</p>
+                            </div>
+                        </div>
+                        <div class="mt-2 bg-sda-navy text-white py-1 text-xs font-bold uppercase tracking-wider rounded">
+                            STUDENT TERMINAL ASSESSMENT REPORT CARD
+                        </div>
+                    </div>
+
+                    <!-- Student Bio Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-5 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div>
+                            <span class="text-slate-400 block font-semibold text-[10px] uppercase">Student Name</span>
+                            <span class="font-bold text-slate-800">${escapeHTML(student.name)}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-semibold text-[10px] uppercase">Student ID / Code</span>
+                            <span class="font-mono text-slate-700 font-semibold">${student.id}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-semibold text-[10px] uppercase">Class</span>
+                            <span class="font-bold text-sda-navy">${activeClass}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-semibold text-[10px] uppercase">Class Position / Rank</span>
+                            <span class="font-black text-emerald-700 text-sm">${student.rankSuffix} out of ${totalStudentsInClass}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-semibold text-[10px] uppercase">Attendance</span>
+                            <span class="font-semibold text-slate-700">${student.attendance || 65} / ${student.totalDays || 65} Days</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-semibold text-[10px] uppercase">Overall Average</span>
+                            <span class="font-bold text-sda-blue">${student.computed.percentage}%</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-semibold text-[10px] uppercase">Conduct & Attitude</span>
+                            <span class="font-medium text-slate-700">${escapeHTML(student.conduct || 'Satisfactory')}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-semibold text-[10px] uppercase">Academic Status</span>
+                            <span class="font-bold text-emerald-600">Promoted</span>
+                        </div>
+                    </div>
+
+                    <!-- Subject Marks Breakdown Table -->
+                    <div class="mb-5">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase mb-2 flex items-center gap-1">
+                            <i class="fa-solid fa-book text-sda-navy"></i> Academic Subject Assessment Breakdown (Class 30% + Exam 70%)
+                        </h3>
+                        <table class="w-full text-left border-collapse border border-slate-200">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 text-[11px] font-bold uppercase border-b border-slate-200">
+                                    <th class="py-2 px-3">Subject Name</th>
+                                    <th class="py-2 px-3 text-center">Class Score (30)</th>
+                                    <th class="py-2 px-3 text-center">Exam Score (70)</th>
+                                    <th class="py-2 px-3 text-center">Total (100)</th>
+                                    <th class="py-2 px-3 text-center">Grade</th>
+                                    <th class="py-2 px-3 text-center">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-slate-50 font-bold text-xs border-t-2 border-slate-300">
+                                    <td class="py-2 px-3 text-slate-800">CUMULATIVE OVERALL TOTAL</td>
+                                    <td colspan="2" class="py-2 px-3 text-right text-slate-500">Aggregate Score:</td>
+                                    <td class="py-2 px-3 text-center text-sda-navy font-black">${student.computed.totalMarks} / ${student.computed.maxPossible}</td>
+                                    <td colspan="2" class="py-2 px-3 text-center text-emerald-700 font-extrabold">${student.computed.grade} (${student.computed.descriptor})</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Teacher Remarks & Signatures -->
+                    <div class="space-y-4 text-xs">
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <span class="font-bold text-slate-800 block uppercase mb-1">Class Teacher's Remark:</span>
+                            <p class="text-slate-700 italic">"${escapeHTML(student.remark || 'Sustained good effort across subjects.')}"</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-8 pt-6 border-t border-slate-300">
+                            <div class="text-center">
+                                <div class="border-b border-slate-400 w-3/4 mx-auto mb-1"></div>
+                                <span class="text-[10px] uppercase font-bold text-slate-500 block">Class Teacher's Signature</span>
+                                <span class="text-xs font-semibold text-slate-800">${currentTeacher.name || 'Class Teacher'}</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="border-b border-slate-400 w-3/4 mx-auto mb-1"></div>
+                                <span class="text-[10px] uppercase font-bold text-slate-500 block">Headteacher's Stamp & Signature</span>
+                                <span class="text-xs font-semibold text-slate-800">Odumase SDA BASIC School</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openReportModal(studentId) {
+            const rankedList = getRankedClassStudents(activeClass);
+            const student = rankedList.find(s => s.id === studentId);
+            if (!student) return;
+
+            document.getElementById('report-modal-header-title').innerHTML = `<i class="fa-solid fa-file-invoice mr-1"></i> Student Report Preview - ${escapeHTML(student.name)}`;
+            const reportContainer = document.getElementById('printable-report-card');
+            reportContainer.innerHTML = generateReportCardHTML(student, rankedList.length);
+
+            document.getElementById('report-card-modal').classList.remove('hidden');
+        }
+
+        function openClassBatchReportModal() {
+            const rankedList = getRankedClassStudents(activeClass);
+            if (rankedList.length === 0) {
+                showToast("No students in this class to print reports for.");
+                return;
+            }
+
+            document.getElementById('report-modal-header-title').innerHTML = `<i class="fa-solid fa-print mr-1"></i> All Report Cards for ${activeClass} (${rankedList.length} Students)`;
+            const reportContainer = document.getElementById('printable-report-card');
+            
+            reportContainer.innerHTML = rankedList.map(student => 
+                generateReportCardHTML(student, rankedList.length)
+            ).join('');
+
+            document.getElementById('report-card-modal').classList.remove('hidden');
+        }
+
+        function closeReportModal() {
+            document.getElementById('report-card-modal').classList.add('hidden');
+        }
+
+        function printReportCard() {
+            window.print();
+        }
+
+        // --- SHARE LINK FEATURE ---
+        function sharePortalLink() {
+            const portalUrl = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Odumase Ben Konadu SDA BASIC Assessment Portal',
+                    text: 'Access the official student assessment database for Odumase Ben Konadu SDA BASIC School.',
+                    url: portalUrl
+                }).catch(() => {});
+            } else {
+                copyToClipboard(portalUrl);
+            }
+        }
+
+        function copyToClipboard(text) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('Portal link copied to clipboard!');
+        }
+
+        // --- EXPORT TO CSV ---
+        function exportClassSummaryCSV() {
+            const rankedList = getRankedClassStudents(activeClass);
+            if (rankedList.length === 0) {
+                showToast("No student data available to export.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += `Position,Student ID,Student Name,Gender,Total Score,Average Percentage,Grade,Teacher Remarks\n`;
+
+            rankedList.forEach(s => {
+                const row = [
+                    `"${s.rankSuffix}"`,
+                    `"${s.id}"`,
+                    `"${s.name.replace(/"/g, '""')}"`,
+                    `"${s.gender}"`,
+                    `"${s.computed.totalMarks}"`,
+                    `"${s.computed.percentage}%"`,
+                    `"${s.computed.grade}"`,
+                    `"${(s.remark || '').replace(/"/g, '""')}"`
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `${activeClass}_Assessment_Summary.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast(`Exported ${activeClass} summary to CSV.`);
+        }
+
+        // --- UTILITY / TOAST NOTIFICATIONS ---
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-sda-navy dark:bg-slate-800 text-white text-xs px-4 py-2.5 rounded-lg shadow-xl border border-sda-gold flex items-center gap-2 pointer-events-auto transition-all duration-300';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-sda-gold text-sm"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+</html>
